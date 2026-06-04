@@ -15,7 +15,10 @@
 // This package is forked from golang.org/x/crypto/pkcs12, which is frozen.
 // The implementation is distilled from https://tools.ietf.org/html/rfc7292
 // and referenced documents.
-package pkcs12 // import "software.sslmate.com/src/go-pkcs12"
+
+// Package pkcs12. This package is forked from software.sslmate.com/src/go-pkcs12,
+// which doesn't support a very flexible PKCS12 API.
+package pkcs12 // import "github.com/ggpslop/go-pkcs12"
 
 import (
 	"crypto/ecdsa"
