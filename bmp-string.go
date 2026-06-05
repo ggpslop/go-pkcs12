@@ -7,6 +7,7 @@ package pkcs12
 import (
 	"errors"
 	"unicode/utf16"
+	"unicode/utf8"
 )
 
 // bmpStringZeroTerminated returns s encoded in UCS-2 with a zero terminator.
@@ -60,4 +61,46 @@ func decodeBMPString(bmpString []byte) (string, error) {
 	}
 
 	return string(utf16.Decode(s)), nil
+}
+
+// bmpStringZeroTerminated returns s encoded in UCS-2 with a zero terminator.
+func bmpStringZeroTerminatedFromBytes(b []byte) ([]byte, error) {
+	// References:
+	// https://tools.ietf.org/html/rfc7292#appendix-B.1
+	// The above RFC provides the info that BMPStrings are NULL terminated.
+
+	ret, err := bmpStringFromBytes(b)
+	if err != nil {
+		return nil, err
+	}
+
+	return append(ret, 0, 0), nil
+}
+
+// bmpString returns s encoded in UCS-2
+func bmpStringFromBytes(b []byte) ([]byte, error) {
+	// References:
+	// https://tools.ietf.org/html/rfc7292#appendix-B.1
+	// https://en.wikipedia.org/wiki/Plane_(Unicode)#Basic_Multilingual_Plane
+	//  - non-BMP characters are encoded in UTF 16 by using a surrogate pair of 16-bit codes
+	//	  EncodeRune returns 0xfffd if the rune does not need special encoding
+
+	size := len(b)
+	ret := make([]byte, 0, 2*size+2)
+
+	for i := 0; i < size; {
+		r, s := utf8.DecodeRune(b[i:])
+		if r == utf8.RuneError && s == 1 {
+			return nil, errors.New("pkcs12: string contains invalid UTF-8 sequence")
+		}
+		i += s
+
+		if t, _ := utf16.EncodeRune(r); t != 0xfffd {
+			return nil, errors.New("pkcs12: string contains characters that cannot be encoded in UCS-2")
+		}
+
+		ret = append(ret, byte(r>>8), byte(r))
+	}
+
+	return ret, nil
 }

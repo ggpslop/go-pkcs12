@@ -73,3 +73,49 @@ func TestBMPString(t *testing.T) {
 		}
 	}
 }
+
+func TestBMPStringFromBytes(t *testing.T) {
+	for i, test := range bmpStringTests {
+		expected, err := hex.DecodeString(test.expectedHex)
+		if err != nil {
+			t.Fatalf("#%d: failed to decode expectation", i)
+		}
+
+		var in = []byte(test.in)
+		var out []byte
+
+		if test.zeroTerminated {
+			out, err = bmpStringZeroTerminatedFromBytes(in)
+		} else {
+			out, err = bmpStringFromBytes(in)
+		}
+
+		if err == nil && test.shouldFail {
+			t.Errorf("#%d: expected to fail, but produced %x", i, out)
+			continue
+		}
+
+		if err != nil && !test.shouldFail {
+			t.Errorf("#%d: failed unexpectedly: %s", i, err)
+			continue
+		}
+
+		if !test.shouldFail {
+			if !bytes.Equal(out, expected) {
+				t.Errorf("#%d: expected %s, got %x", i, test.expectedHex, out)
+				continue
+			}
+
+			roundTrip, err := decodeBMPString(out)
+			if err != nil {
+				t.Errorf("#%d: decoding output gave an error: %s", i, err)
+				continue
+			}
+
+			if !bytes.Equal([]byte(roundTrip), in) {
+				t.Errorf("#%d: decoding output resulted in %q, but it should have been %q", i, roundTrip, test.in)
+				continue
+			}
+		}
+	}
+}
