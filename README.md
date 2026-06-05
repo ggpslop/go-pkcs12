@@ -2,18 +2,13 @@
 
 [![Documentation](https://pkg.go.dev/badge/github.com/ggpslop/go-pkcs12)](https://pkg.go.dev/github.com/ggpslop/go-pkcs12)
 
-    import "github.com/ggpslop/go-pkcs12" 
-
-Package pkcs12 implements some of PKCS#12 (also known as P12 or PFX).
-It is intended for decoding DER-encoded P12/PFX files for use with the `crypto/tls`
-package, and for encoding P12/PFX files for use by legacy applications which
-do not support newer formats.  Since PKCS#12 uses weak encryption
-primitives, it SHOULD NOT be used for new applications.
-
-Note that only DER-encoded PKCS#12 files are supported, even though PKCS#12
-allows BER encoding.  This is because encoding/asn1 only supports DER.
+    import "github.com/ggpslop/go-pkcs12"
 
 This package is forked from `software.sslmate.com/src/go-pkcs12`, which doesn't support a very flexible PKCS12 API.
+It implements exactly the same API as `software.sslmate.com/src/go-pkcs12`, but adds a Builder that allows the construction of an arbitrarily complex PKCS12 (multiple PrivateKeyEntries + multiple TrustedCertificateEntry + friendly names / aliases).
+
+Note that only DER-encoded PKCS#12 files are supported, even though PKCS#12
+allows BER encoding. This is because encoding/asn1 only supports DER.
 
 ## Import Path
 
