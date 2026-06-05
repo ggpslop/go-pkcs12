@@ -184,6 +184,15 @@ func (s *Builder) Build() (pfxData []byte, err error) {
 
 	var authenticatedSafe = make([]contentInfo, 0, 3)
 
+	// Add Trusted Certificates.
+	if len(s.trustedBags) != 0 {
+		ci, err := makeSafeContents(enc.rand, s.trustedBags, enc.certAlgorithm, s.encodedPassword, enc.encryptionIterations, enc.saltLen)
+		if err != nil {
+			return nil, err
+		}
+		authenticatedSafe = append(authenticatedSafe, ci)
+	}
+
 	// Add Certificates with their Private Keys and Chains.
 	if len(s.certBags) != 0 {
 		ci, err := makeSafeContents(enc.rand, s.certBags, enc.certAlgorithm, s.encodedPassword, enc.encryptionIterations, enc.saltLen)
@@ -193,15 +202,6 @@ func (s *Builder) Build() (pfxData []byte, err error) {
 		authenticatedSafe = append(authenticatedSafe, ci)
 
 		ci, err = makeSafeContents(enc.rand, s.prvKeyBags, nil, nil, 0, 0)
-		if err != nil {
-			return nil, err
-		}
-		authenticatedSafe = append(authenticatedSafe, ci)
-	}
-
-	// Add Trusted Certificates.
-	if len(s.trustedBags) != 0 {
-		ci, err := makeSafeContents(enc.rand, s.trustedBags, enc.certAlgorithm, s.encodedPassword, enc.encryptionIterations, enc.saltLen)
 		if err != nil {
 			return nil, err
 		}
