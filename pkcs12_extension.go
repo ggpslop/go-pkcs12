@@ -170,9 +170,9 @@ func (s *Builder) SetTrustedCertificateEntry(friendlyName string, certificate *x
 }
 
 // Build the entire PKCS12 object in memory structured like this:
-//  1. AuthenticatedSafe: PrivateKeyEntry certificates;
-//  2. AuthenticatedSafe: PrivateKeyEntry private keys;
-//  3. AuthenticatedSafe: Trusted certificates.
+//  1. AuthenticatedSafe: Trusted certificates;
+//  2. AuthenticatedSafe: PrivateKeyEntry certificates;
+//  3. AuthenticatedSafe: PrivateKeyEntry private keys;
 //
 // Erase the internal encoded copy of the password regardless of the result.
 func (s *Builder) Build() (pfxData []byte, err error) {
