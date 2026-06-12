@@ -20,9 +20,9 @@ type Builder struct {
 }
 
 type Options struct {
-	orderFirstTrusts bool
-	prvKeyEntryLen   uint8
-	trustCertLen     uint8
+	OrderFirstTrusts bool
+	PrvKeyEntryLen   uint8
+	TrustCertLen     uint8
 }
 
 var (
@@ -44,15 +44,15 @@ func NewBuilder(enc *Encoder, password []byte, opt Options) (Builder, error) {
 
 	var s = Builder{
 		enc:     enc,
-		aliases: make(map[string]struct{}, opt.prvKeyEntryLen+opt.trustCertLen),
+		aliases: make(map[string]struct{}, opt.PrvKeyEntryLen+opt.TrustCertLen),
 	}
 
-	if opt.prvKeyEntryLen > 0 {
-		s.certBags = make([]safeBag, 0, opt.prvKeyEntryLen*3)
-		s.prvKeyBags = make([]safeBag, 0, opt.prvKeyEntryLen)
+	if opt.PrvKeyEntryLen > 0 {
+		s.certBags = make([]safeBag, 0, opt.PrvKeyEntryLen*3)
+		s.prvKeyBags = make([]safeBag, 0, opt.PrvKeyEntryLen)
 	}
-	if opt.trustCertLen > 0 {
-		s.trustedBags = make([]safeBag, 0, opt.trustCertLen)
+	if opt.TrustCertLen > 0 {
+		s.trustedBags = make([]safeBag, 0, opt.TrustCertLen)
 	}
 	if enc.macAlgorithm == nil && enc.certAlgorithm == nil && enc.keyAlgorithm == nil && len(password) != 0 {
 		return Builder{}, errors.New("pkcs12: password must be empty")
@@ -63,7 +63,7 @@ func NewBuilder(enc *Encoder, password []byte, opt Options) (Builder, error) {
 		return Builder{}, err
 	}
 
-	s.orderFirstTrusts = opt.orderFirstTrusts
+	s.orderFirstTrusts = opt.OrderFirstTrusts
 
 	return s, nil
 }
